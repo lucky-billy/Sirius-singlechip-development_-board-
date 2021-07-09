@@ -8,6 +8,7 @@
 #include "hc05.h" 	 
 #include "usart3.h" 
 #include "bcomponent.h"
+#include "exti.h"
 
 int main(void)
 { 
@@ -16,6 +17,7 @@ int main(void)
 	
 	uart_init(9600);				// 初始化串口
 	BCOMPONENT_Init();				// 初始化自定义引脚
+	EXTIX_Init();					// 外部中断初始化
 	
 	while ( HC05_Init() ) 			// 初始化HC05蓝牙模块
 	{
@@ -110,6 +112,23 @@ int main(void)
 	
 	while(1)
 	{
+		// 消抖
+		delay_ms(10);
+		
+		// 判断限位
+		if ( LIMIT0 != 0 || LIMIT1 != 0 ) {
+			// 调焦限位触发
+			GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
+		}
+		if ( LIMIT2 != 0 || LIMIT3 != 0 ) {
+			// 变倍限位触发
+			GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		}
+		if ( LIMIT4 != 0 || LIMIT5 != 0 ) {
+			// 对比度限位触发
+			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+		}
+		
 		// 蓝牙
 		if( USART3_RX_STA & 0X8000 )
 		{
@@ -151,34 +170,34 @@ int main(void)
 			
 			// 变倍左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '5' ) {
-				GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
+				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 				u3_printf("Zoom - reduce pressed !\r\n");
 			}
 			
 			// 变倍左旋钮 - 抬起
 			if ( USART3_RX_BUF[0] == '6' ) {
-				GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				u3_printf("Zoom - reduce released !\r\n");
 			}
 				
 			//  变倍右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '7' ) {
-				GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
-				GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+				GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				u3_printf("Zoom - increase pressed !\r\n");
 			}
 			
 			
 			//  变倍右旋钮 - 抬起
 			if ( USART3_RX_BUF[0] == '8' ) {
-				GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				u3_printf("Zoom - increase released !\r\n");
 			}
 
@@ -188,22 +207,19 @@ int main(void)
 			if ( USART3_RX_BUF[0] == 'a' ) {
 				// 先根据限位确定位置，再转到另一个位置
 				
-				GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-				delay_ms(70);		// 转动时长
-				GPIO_ResetBits(GPIOD, GPIO_Pin_8);		// PD8 = 0
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-			
-				GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
-				GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-				delay_ms(76);		// 转动时长
-				GPIO_ResetBits(GPIOD, GPIO_Pin_8);		// PD8 = 0
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-				
+				if ( LIMIT4 == 0 ) 
+				{
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
+				}
+				else if ( LIMIT5 == 0 )
+				{
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
+				}
+
 				u3_printf("Contrast !\r\n");
 			}
 			
@@ -272,33 +288,33 @@ int main(void)
 			// 变倍 M5
 			if ( USART_RX_BUF[0] == 'e' )
 			{
-				GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
+				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 				printf("Zoom - reduce pressed !\r\n");
 			}
 			
 			if ( USART_RX_BUF[0] == 'f' )
 			{
-				GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				printf("Zoom - reduce released !\r\n");
 			}
 			
 			if ( USART_RX_BUF[0] == 'g' )
 			{
-				GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
-				GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+				GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				printf("Zoom - increase pressed !\r\n");
 			}
 			
 			if ( USART_RX_BUF[0] == 'h' )
 			{
-				GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
-				GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 				printf("Zoom - increase released !\r\n");
 			}
 			
@@ -342,28 +358,32 @@ int main(void)
 			// 对比度 M4
 			if ( USART_RX_BUF[0] == 'm' )
 			{
-				GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-				delay_ms(70);		// 转动时长
-				GPIO_ResetBits(GPIOD, GPIO_Pin_8);		// PD8 = 0
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-				
-				printf("Contrast - reduce !\r\n");
+				if ( LIMIT4 == 0 ) 
+				{
+					printf("CL");
+				}
+				else if ( LIMIT5 == 0 )
+				{
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
+					printf("Contrast - reduce pressed !\r\n");
+				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'n' )
 			{
-				GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
-				GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-				delay_ms(76);		// 转动时长
-				GPIO_ResetBits(GPIOD, GPIO_Pin_8);		// PD8 = 0
-				GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-				GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-				
-				printf("Contrast - increase !\r\n");
+				if ( LIMIT4 == 0 ) 
+				{
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
+					printf("Contrast - increase pressed !\r\n");
+				}
+				else if ( LIMIT5 == 0 )
+				{
+					printf("CR");
+				}
 			}
 			
 			//------------------------------------------------------------------------------
@@ -460,7 +480,5 @@ int main(void)
 
 			USART_RX_STA = 0;
 		}
-
-		delay_ms(10);
 	}
 }
