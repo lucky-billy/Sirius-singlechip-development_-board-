@@ -136,10 +136,14 @@ int main(void)
 			
 			// 调焦左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '1' ) {
-				GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_9);		// PE9 = 1
-				u3_printf("Focus - reduce pressed !\r\n");
+				if ( LIMIT0 != 0 ) {
+					printf("FL");							// 调焦左限位已触发
+				} else {
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_9);		// PE9 = 1
+					printf("Focus - reduce pressed !\r\n");
+				}
 			}
 			
 			// 调焦左旋钮 - 抬起
@@ -152,10 +156,14 @@ int main(void)
 				
 			// 调焦右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '3' ) {
-				GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_8);		// PE8 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
-				u3_printf("Focus - increase pressed !\r\n");
+				if ( LIMIT1 != 0 ) {
+					printf("FR");							// 调焦右限位已触发
+				} else {
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_8);		// PE8 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
+					printf("Focus - increase pressed !\r\n");
+				}
 			}
 			
 			// 调焦右旋钮 - 抬起
@@ -170,10 +178,14 @@ int main(void)
 			
 			// 变倍左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '5' ) {
-				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
-				u3_printf("Zoom - reduce pressed !\r\n");
+				if ( LIMIT2 != 0 ) {
+					printf("ZL");							// 变倍左限位已触发
+				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					printf("Zoom - reduce pressed !\r\n");
+				}
 			}
 			
 			// 变倍左旋钮 - 抬起
@@ -186,10 +198,14 @@ int main(void)
 				
 			//  变倍右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == '7' ) {
-				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
-				u3_printf("Zoom - increase pressed !\r\n");
+				if ( LIMIT3 != 0 ) {
+					printf("ZR");							// 变倍右限位已触发
+				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					printf("Zoom - increase pressed !\r\n");
+				}
 			}
 			
 			
@@ -205,19 +221,21 @@ int main(void)
 			
 			// 对比度
 			if ( USART3_RX_BUF[0] == 'a' ) {
-				// 先根据限位确定位置，再转到另一个位置
-				
-				if ( LIMIT4 == 0 ) 
+				if ( LIMIT4 != 0 ) 
 				{
+					// 左限位已触发，往右边转
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
+					printf("Contrast - increase pressed !\r\n");
 				}
-				else if ( LIMIT5 == 0 )
+				else if ( LIMIT5 != 0 )
 				{
+					// 右限位已触发，往左边转
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
+					printf("Contrast - reduce pressed !\r\n");
 				}
 
 				u3_printf("Contrast !\r\n");
@@ -253,10 +271,14 @@ int main(void)
 			// 调焦 M1
 			if ( USART_RX_BUF[0] == 'a' )
 			{
-				GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_9);		// PE9 = 1
-				printf("Focus - reduce pressed !\r\n");
+				if ( LIMIT0 != 0 ) {
+					printf("FL");							// 调焦左限位已触发
+				} else {
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_9);		// PE9 = 1
+					printf("Focus - reduce pressed !\r\n");
+				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'b' )
@@ -269,10 +291,14 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == 'c' )
 			{
-				GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_8);		// PE8 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
-				printf("Focus - increase pressed !\r\n");
+				if ( LIMIT1 != 0 ) {
+					printf("FR");							// 调焦右限位已触发
+				} else {
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_8);		// PE8 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
+					printf("Focus - increase pressed !\r\n");
+				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'd' )
@@ -288,10 +314,14 @@ int main(void)
 			// 变倍 M5
 			if ( USART_RX_BUF[0] == 'e' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
-				printf("Zoom - reduce pressed !\r\n");
+				if ( LIMIT2 != 0 ) {
+					printf("ZL");							// 变倍左限位已触发
+				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					printf("Zoom - reduce pressed !\r\n");
+				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'f' )
@@ -304,10 +334,14 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == 'g' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
-				printf("Zoom - increase pressed !\r\n");
+				if ( LIMIT3 != 0 ) {
+					printf("ZR");							// 变倍右限位已触发
+				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					printf("Zoom - increase pressed !\r\n");
+				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'h' )
@@ -358,12 +392,9 @@ int main(void)
 			// 对比度 M4
 			if ( USART_RX_BUF[0] == 'm' )
 			{
-				if ( LIMIT4 == 0 ) 
-				{
-					printf("CL");
-				}
-				else if ( LIMIT5 == 0 )
-				{
+				if ( LIMIT4 != 0 ) {	
+					printf("CL");							// 对比度左限位已触发
+				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
@@ -373,16 +404,13 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == 'n' )
 			{
-				if ( LIMIT4 == 0 ) 
-				{
+				if ( LIMIT5 != 0 ) {
+					printf("CR");							// 对比度右限位已触发
+				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
 					printf("Contrast - increase pressed !\r\n");
-				}
-				else if ( LIMIT5 == 0 )
-				{
-					printf("CR");
 				}
 			}
 			
