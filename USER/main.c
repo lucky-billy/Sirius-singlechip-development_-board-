@@ -252,9 +252,9 @@ int main(void)
 					while ( LIMIT5 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(1);
+						delay_ms(2);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(10);
+						delay_ms(20);
 					}
 					
 					contrastState = 2;
@@ -268,9 +268,9 @@ int main(void)
 					while( LIMIT4 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(1);
+						delay_ms(2);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(10);
+						delay_ms(20);
 					}
 					
 					contrastState = 1;
@@ -480,9 +480,9 @@ int main(void)
 					while( LIMIT4 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(1);
+						delay_ms(2);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(10);
+						delay_ms(20);
 					}
 					
 					contrastState = 1;
@@ -501,9 +501,9 @@ int main(void)
 					while ( LIMIT5 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(1);
+						delay_ms(2);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(10);
+						delay_ms(20);
 					}
 					
 					contrastState = 2;
@@ -515,63 +515,63 @@ int main(void)
 			// 明亮度 - 变亮
 			if ( USART_RX_BUF[0] == '1' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(20);
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(5);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '2' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(40);
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(10);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '3' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(60);
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(15);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			// 明亮度 - 变暗
 			if ( USART_RX_BUF[0] == '4' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
-				
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(20);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(5);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '5' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
-				
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(40);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(10);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '6' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
-				
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				delay_ms(60);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				delay_ms(15);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			/*
