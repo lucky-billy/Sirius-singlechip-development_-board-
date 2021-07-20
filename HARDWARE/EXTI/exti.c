@@ -80,7 +80,7 @@ void EXTI0_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line0) == SET )	 
 	{
 		// 调焦左限位触发
-		GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
+		//GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line0); // 清除LINE0上的中断标志位 
 }	
@@ -92,7 +92,7 @@ void EXTI1_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line1) == SET )	 
 	{
 		// 调焦右限位触发
-		GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
+		//GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 	}	 
 	EXTI_ClearITPendingBit(EXTI_Line1);	// 清除LINE1上的中断标志位 
 }
@@ -104,7 +104,7 @@ void EXTI2_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line2) == SET )	 
 	{
 		// 变倍左限位触发
-		GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		//GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line2); // 清除LINE2上的中断标志位  
 }
@@ -116,7 +116,7 @@ void EXTI3_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line3) == SET )	 
 	{
 		// 变倍右限位触发
-		GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		//GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line3);	// 清除LINE3上的中断标志位  
 }
@@ -128,7 +128,7 @@ void EXTI4_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line4) == SET )	 
 	{
 		// 对比度左限位触发
-		GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+		//GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line4);	// 清除LINE4上的中断标志位  
 }
@@ -141,7 +141,7 @@ void EXTI9_5_IRQHandler(void)
 		delay_ms(10);	// 消抖
 		
 		// 对比度右限位触发
-		GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+		//GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 		
 		EXTI_ClearITPendingBit(EXTI_Line5);	// 清除LINE5上的中断标志位  
 	}
