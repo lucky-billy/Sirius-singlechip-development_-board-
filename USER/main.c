@@ -128,7 +128,7 @@ int main(void)
 			u8 len = USART3_RX_STA & 0X7FFF;
 			
 			// 调焦左旋钮 - 按下
-			if ( USART3_RX_BUF[0] == '1' ) {
+			if ( USART3_RX_BUF[0] == 'a' ) {
 				if ( LIMIT0 != 0 ) {
 					u3_printf("FL\r\n");					// 调焦左限位已触发
 				} else {
@@ -144,12 +144,12 @@ int main(void)
 			}
 			
 			// 调焦左旋钮 - 抬起
-			if ( USART3_RX_BUF[0] == '2' ) {
+			if ( USART3_RX_BUF[0] == 'b' ) {
 				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 				
 			// 调焦右旋钮 - 按下
-			if ( USART3_RX_BUF[0] == '3' ) {
+			if ( USART3_RX_BUF[0] == 'c' ) {
 				if ( LIMIT1 != 0 ) {
 					u3_printf("FR\r\n");					// 调焦右限位已触发
 				} else {
@@ -165,14 +165,14 @@ int main(void)
 			}
 			
 			// 调焦右旋钮 - 抬起
-			if ( USART3_RX_BUF[0] == '4' ) {
+			if ( USART3_RX_BUF[0] == 'd' ) {
 				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 			
 			//------------------------------------------------------------------------------
 			
 			// 变倍左旋钮 - 按下
-			if ( USART3_RX_BUF[0] == '5' ) {
+			if ( USART3_RX_BUF[0] == 'e' ) {
 				if ( LIMIT2 != 0 ) {
 					u3_printf("ZL\r\n");					// 变倍左限位已触发
 				} else {
@@ -196,17 +196,13 @@ int main(void)
 				}
 			}
 			
-			/*
 			// 变倍左旋钮 - 抬起
-			if ( USART3_RX_BUF[0] == '6' ) {
+			if ( USART3_RX_BUF[0] == 'f' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 			}
-			*/
 				
 			//  变倍右旋钮 - 按下
-			if ( USART3_RX_BUF[0] == '7' ) {
+			if ( USART3_RX_BUF[0] == 'g' ) {
 				if ( LIMIT3 != 0 ) {
 					u3_printf("ZR\r\n");					// 变倍右限位已触发
 				} else {
@@ -230,38 +226,64 @@ int main(void)
 				}
 			}
 			
-			/*
 			//  变倍右旋钮 - 抬起
-			if ( USART3_RX_BUF[0] == '8' ) {
+			if ( USART3_RX_BUF[0] == 'h' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 			}
-			*/
 
 			//------------------------------------------------------------------------------
 			
-			// 对比度
-			if ( USART3_RX_BUF[0] == 'a' ) {
-				if ( LIMIT4 != 0 || contrastState == 1 ) 
+			// 明亮度左旋钮 - 按下
+			if ( USART_RX_BUF[0] == 'i' )
+			{
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				
+				for ( int i = 0; i < 20; ++i )
 				{
-					// 左限位已触发，往右边转
-					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
-					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-					
-					while ( LIMIT5 == 0 )
-					{
-						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(2);
-						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(20);
-					}
-					
-					contrastState = 2;
+					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
+					delay_ms(1);
+					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
+					delay_ms(5);
 				}
-				else if ( LIMIT5 != 0 || contrastState == 2 )
+			}
+			
+			// 明亮度左旋钮 - 抬起
+			if ( USART_RX_BUF[0] == 'j' )
+			{
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
+			}
+			
+			// 明亮度右旋钮 - 按下
+			if ( USART_RX_BUF[0] == 'k' )
+			{
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				
+				for ( int i = 0; i < 20; ++i )
 				{
-					// 右限位已触发，往左边转
+					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
+					delay_ms(1);
+					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
+					delay_ms(5);
+				}
+			}
+			
+			// 明亮度右旋钮 - 抬起
+			if ( USART_RX_BUF[0] == 'l' )
+			{
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
+			}
+			
+			//------------------------------------------------------------------------------
+			
+			// 对比度左旋钮 - 按下
+			if ( USART_RX_BUF[0] == 'm' )
+			{
+				if ( LIMIT4 != 0 || contrastState == 1 ) {	
+					contrastState = 1;
+					printf("CL");							// 对比度左限位已触发
+				} else {
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
 					
@@ -277,14 +299,38 @@ int main(void)
 				}
 			}
 			
+			// 对比度右旋钮 - 按下
+			if ( USART_RX_BUF[0] == 'n' )
+			{
+				if ( LIMIT5 != 0 || contrastState == 2 ) {
+					contrastState = 2;
+					printf("CR");							// 对比度右限位已触发
+				} else {
+					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
+					
+					while ( LIMIT5 == 0 )
+					{
+						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
+						delay_ms(2);
+						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+						delay_ms(20);
+					}
+					
+					contrastState = 2;
+				}
+			}
+			
+			//------------------------------------------------------------------------------
+			
 			// 对准
-			if ( USART3_RX_BUF[0] == 'b' ) {
+			if ( USART3_RX_BUF[0] == 'o' ) {
 				// 发送信号给上位机，打开对准相机
 				printf("8");
 			}
 			
 			// 测量
-			if ( USART3_RX_BUF[0] == 'c' ) {
+			if ( USART3_RX_BUF[0] == 'p' ) {
 				// 发送信号给上位机，启动测量
 				printf("9");
 			}
@@ -347,7 +393,7 @@ int main(void)
 			
 			//------------------------------------------------------------------------------
 			
-			// 变倍 M5
+			// 变倍 M2
 			if ( USART_RX_BUF[0] == 'e' )
 			{
 				if ( LIMIT2 != 0 ) {
@@ -373,14 +419,10 @@ int main(void)
 				}
 			}
 			
-			/*
 			if ( USART_RX_BUF[0] == 'f' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
-			*/
 			
 			if ( USART_RX_BUF[0] == 'g' )
 			{
@@ -407,14 +449,10 @@ int main(void)
 				}
 			}
 			
-			/*
 			if ( USART_RX_BUF[0] == 'h' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
-			*/
 			
 			//------------------------------------------------------------------------------
 			
@@ -433,14 +471,10 @@ int main(void)
 				}
 			}
 			
-			/*
 			if ( USART_RX_BUF[0] == 'j' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);		// PE12 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);		// PE13 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
-			*/
 			
 			if ( USART_RX_BUF[0] == 'k' )
 			{
@@ -456,14 +490,10 @@ int main(void)
 				}
 			}
 			
-			/*
 			if ( USART_RX_BUF[0] == 'l' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);		// PE12 = 0
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);		// PE13 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
-			*/
 			
 			//------------------------------------------------------------------------------
 			
