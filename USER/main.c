@@ -121,6 +121,11 @@ int main(void)
 		if ( LIMIT0 != 0 || LIMIT1 != 0 ) {
 			GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 		}
+		
+		// 变倍判断限位
+		if ( LIMIT2 != 0 || LIMIT3 != 0 ) {
+			GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		}
 
 		// 蓝牙
 		if( USART3_RX_STA & 0X8000 )
@@ -138,7 +143,7 @@ int main(void)
 					
 					if ( LIMIT1 != 0 ) {
 						// 右限位触发的情况下，先转一会确保离开限位
-						delay_ms(200);
+						delay_ms(500);
 					}
 				}
 			}
@@ -159,7 +164,7 @@ int main(void)
 					
 					if ( LIMIT0 != 0 ) {
 						// 左限位触发的情况下，先转一会确保离开限位
-						delay_ms(200);
+						delay_ms(500);
 					}
 				}
 			}
@@ -176,29 +181,20 @@ int main(void)
 				if ( LIMIT2 != 0 ) {
 					u3_printf("ZL\r\n");					// 变倍左限位已触发
 				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
-					int count = 1;
-					while( LIMIT2 == 0 )
-					{
-						if ( count == 20 ) {
-							break;
-						}
-						
-						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
-						delay_ms(1);
-						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
-						delay_ms(5);
-						
-						count++;
+					if ( LIMIT3 != 0 ) {
+						// 右限位触发的情况下，先转一会确保离开限位
+						delay_ms(50);
 					}
 				}
 			}
 			
 			// 变倍左旋钮 - 抬起
 			if ( USART3_RX_BUF[0] == 'f' ) {
-				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 				
 			//  变倍右旋钮 - 按下
@@ -206,72 +202,45 @@ int main(void)
 				if ( LIMIT3 != 0 ) {
 					u3_printf("ZR\r\n");					// 变倍右限位已触发
 				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
-					int count = 1;
-					while( LIMIT3 == 0 )
-					{
-						if ( count == 20 ) {
-							break;
-						}
-						
-						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
-						delay_ms(1);
-						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
-						delay_ms(5);
-						
-						count++;
+					if ( LIMIT2 != 0 ) {
+						// 左限位触发的情况下，先转一会确保离开限位
+						delay_ms(50);
 					}
 				}
 			}
 			
 			//  变倍右旋钮 - 抬起
 			if ( USART3_RX_BUF[0] == 'h' ) {
-				GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 
 			//------------------------------------------------------------------------------
 			
 			// 明亮度左旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'i' )
-			{
+			if ( USART_RX_BUF[0] == 'i' ) {
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
-				
-				for ( int i = 0; i < 20; ++i )
-				{
-					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-					delay_ms(1);
-					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-					delay_ms(5);
-				}
 			}
 			
 			// 明亮度左旋钮 - 抬起
-			if ( USART_RX_BUF[0] == 'j' )
-			{
+			if ( USART_RX_BUF[0] == 'j' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			// 明亮度右旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'k' )
-			{
+			if ( USART_RX_BUF[0] == 'k' ) {
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
-				
-				for ( int i = 0; i < 20; ++i )
-				{
-					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-					delay_ms(1);
-					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-					delay_ms(5);
-				}
 			}
 			
 			// 明亮度右旋钮 - 抬起
-			if ( USART_RX_BUF[0] == 'l' )
-			{
+			if ( USART_RX_BUF[0] == 'l' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -290,7 +259,7 @@ int main(void)
 					while( LIMIT4 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(2);
+						delay_ms(5);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 						delay_ms(20);
 					}
@@ -312,7 +281,7 @@ int main(void)
 					while ( LIMIT5 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(2);
+						delay_ms(5);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 						delay_ms(20);
 					}
@@ -349,8 +318,7 @@ int main(void)
 			u8 len = USART_RX_STA & 0x3fff;	// 得到此次接收到的数据长度
 			
 			// 调焦 M1
-			if ( USART_RX_BUF[0] == 'a' )
-			{
+			if ( USART_RX_BUF[0] == 'a' ) {
 				if ( LIMIT0 != 0 ) {
 					printf("FL");							// 调焦左限位已触发
 				} else {
@@ -360,18 +328,16 @@ int main(void)
 					
 					if ( LIMIT1 != 0 ) {
 						// 右限位触发的情况下，先转一会确保离开限位
-						delay_ms(200);
+						delay_ms(500);
 					}
 				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'b' )
-			{
+			if ( USART_RX_BUF[0] == 'b' ) {
 				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 			
-			if ( USART_RX_BUF[0] == 'c' )
-			{
+			if ( USART_RX_BUF[0] == 'c' ) {
 				if ( LIMIT1 != 0 ) {
 					printf("FR");							// 调焦右限位已触发
 				} else {
@@ -381,117 +347,76 @@ int main(void)
 					
 					if ( LIMIT0 != 0 ) {
 						// 左限位触发的情况下，先转一会确保离开限位
-						delay_ms(200);
+						delay_ms(500);
 					}
 				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'd' )
-			{
+			if ( USART_RX_BUF[0] == 'd' ) {
 				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 			
 			//------------------------------------------------------------------------------
 			
 			// 变倍 M2
-			if ( USART_RX_BUF[0] == 'e' )
-			{
+			if ( USART3_RX_BUF[0] == 'e' ) {
 				if ( LIMIT2 != 0 ) {
-					printf("ZL");							// 变倍左限位已触发
+					u3_printf("ZL\r\n");					// 变倍左限位已触发
 				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
-					int count = 1;
-					while( LIMIT2 == 0 )
-					{
-						if ( count == 20 ) {
-							break;
-						}
-						
-						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
-						delay_ms(1);
-						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
-						delay_ms(5);
-						
-						count++;
+					if ( LIMIT3 != 0 ) {
+						// 右限位触发的情况下，先转一会确保离开限位
+						delay_ms(50);
 					}
 				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'f' )
-			{
+			if ( USART_RX_BUF[0] == 'f' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 			
-			if ( USART_RX_BUF[0] == 'g' )
-			{
+			if ( USART3_RX_BUF[0] == 'g' ) {
 				if ( LIMIT3 != 0 ) {
-					printf("ZR");							// 变倍右限位已触发
+					u3_printf("ZR\r\n");					// 变倍右限位已触发
 				} else {
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
-					int count = 1;
-					while( LIMIT3 == 0 )
-					{
-						if ( count == 20 ) {
-							break;
-						}
-						
-						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
-						delay_ms(1);
-						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
-						delay_ms(5);
-						
-						count++;
+					if ( LIMIT2 != 0 ) {
+						// 左限位触发的情况下，先转一会确保离开限位
+						delay_ms(50);
 					}
 				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'h' )
-			{
+			if ( USART_RX_BUF[0] == 'h' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 			
 			//------------------------------------------------------------------------------
 			
 			// 明亮度 M3
-			if ( USART_RX_BUF[0] == 'i' )
-			{
+			if ( USART_RX_BUF[0] == 'i' ) {
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
-				
-				for ( int i = 0; i < 20; ++i )
-				{
-					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-					delay_ms(1);
-					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-					delay_ms(5);
-				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'j' )
-			{
+			if ( USART_RX_BUF[0] == 'j' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
-			if ( USART_RX_BUF[0] == 'k' )
-			{
+			if ( USART_RX_BUF[0] == 'k' ) {
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
-				
-				for ( int i = 0; i < 20; ++i )
-				{
-					GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-					delay_ms(1);
-					GPIO_ResetBits(GPIOE, GPIO_Pin_14);		// PE14 = 0
-					delay_ms(5);
-				}
 			}
 			
-			if ( USART_RX_BUF[0] == 'l' )
-			{
+			if ( USART_RX_BUF[0] == 'l' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -510,7 +435,7 @@ int main(void)
 					while( LIMIT4 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(2);
+						delay_ms(5);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 						delay_ms(20);
 					}
@@ -531,7 +456,7 @@ int main(void)
 					while ( LIMIT5 == 0 )
 					{
 						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(2);
+						delay_ms(5);
 						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 						delay_ms(20);
 					}
@@ -549,7 +474,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(5);
+				delay_ms(10);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -559,7 +484,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(10);
+				delay_ms(20);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -569,7 +494,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(15);
+				delay_ms(30);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -580,7 +505,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(5);
+				delay_ms(10);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -590,7 +515,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(10);
+				delay_ms(20);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -600,7 +525,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(15);
+				delay_ms(30);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
