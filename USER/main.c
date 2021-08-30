@@ -482,7 +482,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(10);
+				delay_ms(15);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -492,7 +492,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(20);
+				delay_ms(30);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -502,7 +502,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(30);
+				delay_ms(45);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -513,7 +513,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(10);
+				delay_ms(15);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -523,7 +523,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(20);
+				delay_ms(30);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
@@ -533,7 +533,7 @@ int main(void)
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				delay_ms(30);
+				delay_ms(45);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
