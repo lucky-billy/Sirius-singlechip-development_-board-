@@ -38,9 +38,7 @@ int main(void)
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
 		
 	 GPIO_ResetBits(GPIOB, GPIO_Pin_0);		// PB0 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
-	 
+	
 	
 	 M2:
 	 GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
@@ -52,8 +50,6 @@ int main(void)
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_11);	// PE11 = 0
 	 
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_7);		// PE7 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_10);	// PE10 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_11);	// PE11 = 0
 	 
 	 
 	 M3:
@@ -66,8 +62,6 @@ int main(void)
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_13);	// PE13 = 0
 	 
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// PE14 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_12);	// PE12 = 0
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_13);	// PE13 = 0
 	 
 	 
 	 M4:
@@ -80,8 +74,6 @@ int main(void)
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
 		
 	 GPIO_ResetBits(GPIOD, GPIO_Pin_8);		// PD8 = 0
-	 GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
-	 GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
 	 
 	 
 	 M5:
@@ -94,8 +86,6 @@ int main(void)
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
 	 
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
-	 GPIO_ResetBits(GPIOB, GPIO_Pin_14);	// PB14 = 0
-	 GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
 	 
 	 
 	 M6:
@@ -108,8 +98,21 @@ int main(void)
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_8);		// PC8 = 0
 	 
 	 GPIO_ResetBits(GPIOG, GPIO_Pin_7);		// PG7 = 0
-	 GPIO_ResetBits(GPIOB, GPIO_Pin_15);	// PB15 = 0
-	 GPIO_ResetBits(GPIOC, GPIO_Pin_8);		// PC8 = 0
+	 
+	 
+	 蓝牙输出
+	 USART3_RX_BUF[len] = 0;									// 加结束符
+	 printf("蓝牙发送的消息为: \r%s\r\n\r\n", USART3_RX_BUF);	// 发送数据到上位机
+	 
+	 
+	 串口输出
+	 printf("您发送的消息为: \r");
+	 for ( u8 t = 0; t < len; ++t )
+	 {
+		 USART_SendData(USART1, USART_RX_BUF[t]);         		// 向串口1发送数据
+		 while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);	// 等待发送结束
+	 }
+	 printf("\r\n\r\n");	// 插入换行
 	 */
 	
 	while(1)
@@ -122,10 +125,16 @@ int main(void)
 			GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 		}
 		
-		// 变倍判断限位
-		if ( LIMIT2 != 0 || LIMIT3 != 0 ) {
-			GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		// 对比度判断左限位
+		if ( LIMIT4 != 0 && contrastState == 1 ) {
+			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 		}
+		
+		// 对比度判断右限位
+		if ( LIMIT5 != 0 && contrastState == 2 ) {
+			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+		}
+		
 
 		// 蓝牙
 		if( USART3_RX_STA & 0X8000 )
@@ -181,13 +190,22 @@ int main(void)
 				if ( LIMIT2 != 0 ) {
 					u3_printf("ZL\r\n");					// 变倍左限位已触发
 				} else {
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
-					if ( LIMIT3 != 0 ) {
-						// 右限位触发的情况下，先转一会确保离开限位
-						delay_ms(50);
+					int count = 1;
+					while( LIMIT2 == 0 )
+					{
+						if ( count == 20 ) {
+							break;
+						}
+						
+						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+						delay_ms(2);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+						delay_ms(5);
+						
+						count++;
 					}
 				}
 			}
@@ -202,13 +220,22 @@ int main(void)
 				if ( LIMIT3 != 0 ) {
 					u3_printf("ZR\r\n");					// 变倍右限位已触发
 				} else {
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
-					if ( LIMIT2 != 0 ) {
-						// 左限位触发的情况下，先转一会确保离开限位
-						delay_ms(50);
+					int count = 1;
+					while( LIMIT3 == 0 )
+					{
+						if ( count == 20 ) {
+							break;
+						}
+						
+						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+						delay_ms(2);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+						delay_ms(5);
+						
+						count++;
 					}
 				}
 			}
@@ -221,71 +248,55 @@ int main(void)
 			//------------------------------------------------------------------------------
 			
 			// 明亮度左旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'i' ) {
+			if ( USART3_RX_BUF[0] == 'i' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
 			}
 			
 			// 明亮度左旋钮 - 抬起
-			if ( USART_RX_BUF[0] == 'j' ) {
+			if ( USART3_RX_BUF[0] == 'j' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			// 明亮度右旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'k' ) {
+			if ( USART3_RX_BUF[0] == 'k' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
 			}
 			
 			// 明亮度右旋钮 - 抬起
-			if ( USART_RX_BUF[0] == 'l' ) {
+			if ( USART3_RX_BUF[0] == 'l' ) {
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			//------------------------------------------------------------------------------
 			
 			// 对比度左旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'm' )
+			if ( USART3_RX_BUF[0] == 'm' )
 			{
 				if ( LIMIT4 != 0 || contrastState == 1 ) {	
 					contrastState = 1;
-					printf("CL");							// 对比度左限位已触发
+					u3_printf("CL\r\n");					// 对比度左限位已触发
 				} else {
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-					
-					while( LIMIT4 == 0 )
-					{
-						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(5);
-						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(20);
-					}
-					
 					contrastState = 1;
 				}
 			}
 			
 			// 对比度右旋钮 - 按下
-			if ( USART_RX_BUF[0] == 'n' )
+			if ( USART3_RX_BUF[0] == 'n' )
 			{
 				if ( LIMIT5 != 0 || contrastState == 2 ) {
 					contrastState = 2;
-					printf("CR");							// 对比度右限位已触发
+					u3_printf("CR\r\n");					// 对比度右限位已触发
 				} else {
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-					
-					while ( LIMIT5 == 0 )
-					{
-						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(5);
-						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(20);
-					}
-					
 					contrastState = 2;
 				}
 			}
@@ -303,11 +314,6 @@ int main(void)
 				// 发送信号给上位机，启动测量
 				printf("9");
 			}
-			
-			/*
-			USART3_RX_BUF[len] = 0;									// 加结束符
-			printf("蓝牙发送的消息为: \r%s\r\n\r\n", USART3_RX_BUF);	// 发送数据到上位机
-			*/
 			
 			USART3_RX_STA = 0;
 		}
@@ -359,17 +365,26 @@ int main(void)
 			//------------------------------------------------------------------------------
 			
 			// 变倍 M2
-			if ( USART3_RX_BUF[0] == 'e' ) {
+			if ( USART_RX_BUF[0] == 'e' ) {
 				if ( LIMIT2 != 0 ) {
-					u3_printf("ZL\r\n");					// 变倍左限位已触发
+					printf("ZL");							// 变倍左限位已触发
 				} else {
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
-					if ( LIMIT3 != 0 ) {
-						// 右限位触发的情况下，先转一会确保离开限位
-						delay_ms(50);
+					int count = 1;
+					while( LIMIT2 == 0 )
+					{
+						if ( count == 20 ) {
+							break;
+						}
+						
+						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+						delay_ms(2);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+						delay_ms(5);
+						
+						count++;
 					}
 				}
 			}
@@ -378,17 +393,26 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 			
-			if ( USART3_RX_BUF[0] == 'g' ) {
+			if ( USART_RX_BUF[0] == 'g' ) {
 				if ( LIMIT3 != 0 ) {
-					u3_printf("ZR\r\n");					// 变倍右限位已触发
+					printf("ZR");							// 变倍右限位已触发
 				} else {
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
-					if ( LIMIT2 != 0 ) {
-						// 左限位触发的情况下，先转一会确保离开限位
-						delay_ms(50);
+					int count = 1;
+					while( LIMIT3 == 0 )
+					{
+						if ( count == 20 ) {
+							break;
+						}
+						
+						GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+						delay_ms(2);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+						delay_ms(5);
+						
+						count++;
 					}
 				}
 			}
@@ -429,17 +453,9 @@ int main(void)
 					contrastState = 1;
 					printf("CL");							// 对比度左限位已触发
 				} else {
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-					
-					while( LIMIT4 == 0 )
-					{
-						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(5);
-						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(20);
-					}
-					
 					contrastState = 1;
 				}
 			}
@@ -450,17 +466,9 @@ int main(void)
 					contrastState = 2;
 					printf("CR");							// 对比度右限位已触发
 				} else {
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-					
-					while ( LIMIT5 == 0 )
-					{
-						GPIO_SetBits(GPIOD, GPIO_Pin_8);	// PD8 = 1
-						delay_ms(5);
-						GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
-						delay_ms(20);
-					}
-					
 					contrastState = 2;
 				}
 			}
@@ -529,15 +537,7 @@ int main(void)
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
-			/*
-			printf("您发送的消息为: \r");
-			for ( u8 t = 0; t < len; ++t )
-			{
-				USART_SendData(USART1, USART_RX_BUF[t]);         		// 向串口1发送数据
-				while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);	// 等待发送结束
-			}
-			printf("\r\n\r\n");	// 插入换行
-			*/
+
 
 			USART_RX_STA = 0;
 		}
