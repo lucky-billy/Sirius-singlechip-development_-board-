@@ -34,14 +34,14 @@ https://blog.csdn.net/zht_2000/article/details/103556556
 https://blog.csdn.net/feilusia/article/details/52859232
  */
 
-#define LIMIT0 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_0) 	// PD0	调焦左限位
-#define LIMIT1 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_1)	// PD1	调焦右限位
-#define LIMIT2 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_2) 	// PD2	变倍左限位
-#define LIMIT3 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_3) 	// PD3	变倍右限位
-#define LIMIT4 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_4) 	// PD4	对比度左限位
-#define LIMIT5 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_5) 	// PD5	对比度右限位
-#define LIMIT6 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_6) 	// PD6	预留限位
-#define LIMIT7 	GPIO_ReadInputDataBit(GPIOD, GPIO_Pin_7) 	// PD7	预留限位
+#define LIMIT0 	GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) 	// PA0	调焦左限位
+#define LIMIT1 	GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_6)	// PA6	调焦右限位
+#define LIMIT2 	GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_3) 	// PC3	变倍左限位
+#define LIMIT3 	GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3) 	// PA3	变倍右限位
+#define LIMIT4 	GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_2) 	// PC2	对比度左限位
+#define LIMIT5 	GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_2) 	// PA2	对比度右限位
+#define LIMIT6 	GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_1) 	// PC1	双光源左限位
+#define LIMIT7 	GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) 	// PA1	双光源右限位
 
 void EXTIX_Init(void);	// 外部中断初始化		
 

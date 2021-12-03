@@ -20,6 +20,7 @@ int main(void)
 	EXTIX_Init();					// 外部中断初始化
 	
 	u8 contrastState = 0;			// 对比度状态位
+	u8 lightSource = 0;				// 光源状态位
 	
 	while ( HC05_Init() ) 			// 初始化HC05蓝牙模块
 	{
@@ -54,12 +55,12 @@ int main(void)
 	 
 	 M3:
 	 GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-	 GPIO_ResetBits(GPIOE, GPIO_Pin_12);	// PE12 = 0
-	 GPIO_SetBits(GPIOE, GPIO_Pin_13);		// PE13 = 1
-	 
-	 GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
-	 GPIO_SetBits(GPIOE, GPIO_Pin_12);		// PE12 = 1
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_13);	// PE13 = 0
+	 GPIO_SetBits(GPIOE, GPIO_Pin_12);		// PE12 = 1
+
+	 GPIO_SetBits(GPIOE, GPIO_Pin_14);		// PE14 = 1
+	 GPIO_SetBits(GPIOE, GPIO_Pin_13);		// PE13 = 1
+	 GPIO_ResetBits(GPIOE, GPIO_Pin_12);	// PE12 = 0
 	 
 	 GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// PE14 = 0
 	 
@@ -77,27 +78,20 @@ int main(void)
 	 
 	 
 	 M5:
-	 GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
+	 GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 	 GPIO_ResetBits(GPIOB, GPIO_Pin_14);	// PB14 = 0
 	 GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
 	 
-	 GPIO_SetBits(GPIOC, GPIO_Pin_9);		// PC9 = 1
+	 GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 	 GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
 	 
-	 GPIO_ResetBits(GPIOC, GPIO_Pin_9);		// PC9 = 0
+	 GPIO_ResetBits(GPIOG, GPIO_Pin_6);		// PG6 = 0
 	 
 	 
 	 M6:
-	 GPIO_SetBits(GPIOG, GPIO_Pin_7);		// PG7 = 1
-	 GPIO_ResetBits(GPIOB, GPIO_Pin_15);	// PB15 = 0
 	 GPIO_SetBits(GPIOC, GPIO_Pin_8);		// PC8 = 1
-	 
-	 GPIO_SetBits(GPIOG, GPIO_Pin_7);		// PG7 = 1
-	 GPIO_SetBits(GPIOB, GPIO_Pin_15);		// PB15 = 1
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_8);		// PC8 = 0
-	 
-	 GPIO_ResetBits(GPIOG, GPIO_Pin_7);		// PG7 = 0
 	 
 	 
 	 蓝牙输出
@@ -133,6 +127,16 @@ int main(void)
 		// 对比度判断右限位
 		if ( LIMIT5 != 0 && contrastState == 2 ) {
 			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
+		}
+		
+		// 双光源判断左限位
+		if ( LIMIT6 != 0 && lightSource == 1 ) {
+			GPIO_ResetBits(GPIOG, GPIO_Pin_6);	// PG6 = 0
+		}
+		
+		// 双光源判断右限位
+		if ( LIMIT7 != 0 && lightSource == 2 ) {
+			GPIO_ResetBits(GPIOG, GPIO_Pin_6);	// PG6 = 0
 		}
 		
 
@@ -250,8 +254,8 @@ int main(void)
 			// 明亮度左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'i' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 			}
 			
 			// 明亮度左旋钮 - 抬起
@@ -262,8 +266,8 @@ int main(void)
 			// 明亮度右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'k' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 			}
 			
 			// 明亮度右旋钮 - 抬起
@@ -303,14 +307,44 @@ int main(void)
 			
 			//------------------------------------------------------------------------------
 			
+			// 双光源左旋钮 - 按下
+			if ( USART3_RX_BUF[0] == 'o' )
+			{
+				if ( LIMIT6 != 0 || lightSource == 1 ) {	
+					lightSource = 1;
+					u3_printf("LL\r\n");					// 双光源左限位已触发
+				} else {
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
+					lightSource = 1;
+				}
+			}
+			
+			// 双光源右旋钮 - 按下
+			if ( USART3_RX_BUF[0] == 'p' )
+			{
+				if ( LIMIT7 != 0 || lightSource == 2 ) {
+					lightSource = 2;
+					u3_printf("LR\r\n");					// 双光源右限位已触发
+				} else {
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+					lightSource = 2;
+				}
+			}
+			
+			//------------------------------------------------------------------------------
+			
 			// 对准
-			if ( USART3_RX_BUF[0] == 'o' ) {
+			if ( USART3_RX_BUF[0] == 'q' ) {
 				// 发送信号给上位机，打开对准相机
 				printf("8");
 			}
 			
 			// 测量
-			if ( USART3_RX_BUF[0] == 'p' ) {
+			if ( USART3_RX_BUF[0] == 'r' ) {
 				// 发送信号给上位机，启动测量
 				printf("9");
 			}
@@ -426,8 +460,8 @@ int main(void)
 			// 明亮度 M3
 			if ( USART_RX_BUF[0] == 'i' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 			}
 			
 			if ( USART_RX_BUF[0] == 'j' ) {
@@ -436,8 +470,9 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == 'k' ) {
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				
 			}
 			
 			if ( USART_RX_BUF[0] == 'l' ) {
@@ -475,11 +510,40 @@ int main(void)
 			
 			//------------------------------------------------------------------------------
 			
+			// 双光源 M5
+			if ( USART_RX_BUF[0] == 'o' )
+			{
+				if ( LIMIT6 != 0 || lightSource == 1 ) {	
+					lightSource = 1;
+					printf("LL");							// 双光源左限位已触发
+				} else {
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
+					lightSource = 1;
+				}
+			}
+			
+			if ( USART_RX_BUF[0] == 'p' )
+			{
+				if ( LIMIT7 != 0 || lightSource == 2 ) {
+					lightSource = 2;
+					printf("LR");							// 双光源右限位已触发
+				} else {
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
+					lightSource = 2;
+				}
+			}
+			
+			//------------------------------------------------------------------------------
+			
 			// 明亮度 - 变亮
 			if ( USART_RX_BUF[0] == '1' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(15);
@@ -488,8 +552,8 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == '2' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(30);
@@ -498,8 +562,8 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == '3' )
 			{
-				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
-				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(45);
@@ -509,8 +573,8 @@ int main(void)
 			// 明亮度 - 变暗
 			if ( USART_RX_BUF[0] == '4' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(15);
@@ -519,8 +583,8 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == '5' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(30);
@@ -529,15 +593,13 @@ int main(void)
 			
 			if ( USART_RX_BUF[0] == '6' )
 			{
-				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
-				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 				
 				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(45);
 				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
-			
-
 
 			USART_RX_STA = 0;
 		}

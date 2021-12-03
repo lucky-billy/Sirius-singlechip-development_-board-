@@ -6,13 +6,20 @@ void EXTIX_Init(void)
 {
 	// 引脚配置
 	GPIO_InitTypeDef  GPIO_InitStructure;
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);			// 使能GPIOD时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);			// 使能GPIOA时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);			// 使能GPIOC时钟
  
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_6;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;					// 普通输入模式
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;				// 100M
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;					// 上拉
-	GPIO_Init(GPIOD, &GPIO_InitStructure);							// 初始化 GPIOD0 - GPIOD7
+	GPIO_Init(GPIOA, &GPIO_InitStructure);							// 初始化 GPIOA0, GPIOA1, GPIOA2, GPIOA3, GPIOA6
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;					// 普通输入模式
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;				// 100M
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;					// 上拉
+	GPIO_Init(GPIOC, &GPIO_InitStructure);							// 初始化 GPIOC1, GPIOC2, GPIOC3
 	
 	// 外部IO中断配置
 	EXTI_InitTypeDef   EXTI_InitStructure;
@@ -80,7 +87,6 @@ void EXTI0_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line0) == SET )	 
 	{
 		// 调焦左限位触发
-		//GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line0); // 清除LINE0上的中断标志位 
 }	
@@ -92,7 +98,6 @@ void EXTI1_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line1) == SET )	 
 	{
 		// 调焦右限位触发
-		//GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 	}	 
 	EXTI_ClearITPendingBit(EXTI_Line1);	// 清除LINE1上的中断标志位 
 }
@@ -104,7 +109,6 @@ void EXTI2_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line2) == SET )	 
 	{
 		// 变倍左限位触发
-		//GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line2); // 清除LINE2上的中断标志位  
 }
@@ -116,7 +120,6 @@ void EXTI3_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line3) == SET )	 
 	{
 		// 变倍右限位触发
-		//GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line3);	// 清除LINE3上的中断标志位  
 }
@@ -128,7 +131,6 @@ void EXTI4_IRQHandler(void)
 	if( EXTI_GetITStatus(EXTI_Line4) == SET )	 
 	{
 		// 对比度左限位触发
-		//GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 	}		 
 	EXTI_ClearITPendingBit(EXTI_Line4);	// 清除LINE4上的中断标志位  
 }
@@ -141,7 +143,6 @@ void EXTI9_5_IRQHandler(void)
 		delay_ms(10);	// 消抖
 		
 		// 对比度右限位触发
-		//GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 		
 		EXTI_ClearITPendingBit(EXTI_Line5);	// 清除LINE5上的中断标志位  
 	}
@@ -150,7 +151,7 @@ void EXTI9_5_IRQHandler(void)
 	{
 		delay_ms(10);	// 消抖
 		
-		// 限位6触发
+		// 双光源左限位触发
 		
 		EXTI_ClearITPendingBit(EXTI_Line6);	// 清除LINE6上的中断标志位  
 	}	
@@ -159,7 +160,7 @@ void EXTI9_5_IRQHandler(void)
 	{
 		delay_ms(10);	// 消抖
 		
-		// 限位7触发
+		// 双光源右限位触发
 		
 		EXTI_ClearITPendingBit(EXTI_Line7);	// 清除LINE7上的中断标志位  
 	}	
