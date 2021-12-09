@@ -19,8 +19,8 @@ int main(void)
 	BCOMPONENT_Init();				// 初始化自定义引脚
 	EXTIX_Init();					// 外部中断初始化
 	
-	u8 contrastState = 0;			// 对比度状态位
-	u8 lightSource = 0;				// 光源状态位
+	u8 contrastState = 0;			// 对比度状态位	1-往左转 2-往右转
+	u8 lightSource = 0;				// 光源状态位 	1-往左转 2-往右转
 	
 	while ( HC05_Init() ) 			// 初始化HC05蓝牙模块
 	{
@@ -280,28 +280,26 @@ int main(void)
 			// 对比度左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'm' )
 			{
-				if ( LIMIT4 != 0 || contrastState == 1 ) {	
-					contrastState = 1;
+				if ( LIMIT4 != 0 && contrastState == 1 ) {	
 					u3_printf("CL\r\n");					// 对比度左限位已触发
 				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-					contrastState = 1;
+					contrastState = 1;						// 往左转
 				}
 			}
 			
 			// 对比度右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'n' )
 			{
-				if ( LIMIT5 != 0 || contrastState == 2 ) {
-					contrastState = 2;
+				if ( LIMIT5 != 0 && contrastState == 2 ) {
 					u3_printf("CR\r\n");					// 对比度右限位已触发
 				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-					contrastState = 2;
+					contrastState = 2;						// 往右转
 				}
 			}
 			
@@ -310,28 +308,26 @@ int main(void)
 			// 双光源左旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'o' )
 			{
-				if ( LIMIT6 != 0 || lightSource == 1 ) {	
-					lightSource = 1;
+				if ( LIMIT6 != 0 && lightSource == 1 ) {	
 					u3_printf("LL\r\n");					// 双光源左限位已触发
 				} else {
 					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 					GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
-					lightSource = 1;
+					lightSource = 1;						// 往左转	
 				}
 			}
 			
 			// 双光源右旋钮 - 按下
 			if ( USART3_RX_BUF[0] == 'p' )
 			{
-				if ( LIMIT7 != 0 || lightSource == 2 ) {
-					lightSource = 2;
+				if ( LIMIT7 != 0 && lightSource == 2 ) {
 					u3_printf("LR\r\n");					// 双光源右限位已触发
 				} else {
 					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 					GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
-					lightSource = 2;
+					lightSource = 2;						// 往右转
 				}
 			}
 			
@@ -484,27 +480,25 @@ int main(void)
 			// 对比度 M4
 			if ( USART_RX_BUF[0] == 'm' )
 			{
-				if ( LIMIT4 != 0 || contrastState == 1 ) {	
-					contrastState = 1;
+				if ( LIMIT4 != 0 && contrastState == 1 ) {	
 					printf("CL");							// 对比度左限位已触发
 				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
-					contrastState = 1;
+					contrastState = 1;						// 往左转
 				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'n' )
 			{
-				if ( LIMIT5 != 0 || contrastState == 2 ) {
-					contrastState = 2;
+				if ( LIMIT5 != 0 && contrastState == 2 ) {
 					printf("CR");							// 对比度右限位已触发
 				} else {
 					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
 					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
-					contrastState = 2;
+					contrastState = 2;						// 往右转
 				}
 			}
 			
@@ -513,27 +507,25 @@ int main(void)
 			// 双光源 M5
 			if ( USART_RX_BUF[0] == 'o' )
 			{
-				if ( LIMIT6 != 0 || lightSource == 1 ) {	
-					lightSource = 1;
+				if ( LIMIT6 != 0 && lightSource == 1 ) {	
 					printf("LL");							// 双光源左限位已触发
 				} else {
 					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 					GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
 					GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
-					lightSource = 1;
+					lightSource = 1;						// 往左转
 				}
 			}
 			
 			if ( USART_RX_BUF[0] == 'p' )
 			{
-				if ( LIMIT7 != 0 || lightSource == 2 ) {
-					lightSource = 2;
+				if ( LIMIT7 != 0 && lightSource == 2 ) {
 					printf("LR");							// 双光源右限位已触发
 				} else {
 					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
 					GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
 					GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
-					lightSource = 2;
+					lightSource = 2;						// 往右转	
 				}
 			}
 			
