@@ -194,6 +194,8 @@ int main(void)
 				if ( LIMIT2 != 0 ) {
 					u3_printf("ZL\r\n");					// 变倍左限位已触发
 				} else {
+					/*
+					// 点动模式
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
@@ -211,6 +213,11 @@ int main(void)
 						
 						count++;
 					}
+					*/
+					
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -224,6 +231,8 @@ int main(void)
 				if ( LIMIT3 != 0 ) {
 					u3_printf("ZR\r\n");					// 变倍右限位已触发
 				} else {
+					/*
+					// 点动模式
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
@@ -241,6 +250,11 @@ int main(void)
 						
 						count++;
 					}
+					*/
+					
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -399,6 +413,8 @@ int main(void)
 				if ( LIMIT2 != 0 ) {
 					printf("ZL");							// 变倍左限位已触发
 				} else {
+					/*
+					// 点动模式
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
@@ -416,6 +432,11 @@ int main(void)
 						
 						count++;
 					}
+					*/
+					
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -427,6 +448,8 @@ int main(void)
 				if ( LIMIT3 != 0 ) {
 					printf("ZR");							// 变倍右限位已触发
 				} else {
+					/*
+					// 点动模式
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
@@ -444,6 +467,11 @@ int main(void)
 						
 						count++;
 					}
+					*/
+					
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
