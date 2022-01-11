@@ -119,6 +119,11 @@ int main(void)
 			GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 		}
 		
+		// 变倍判断限位
+		if ( LIMIT2 != 0 || LIMIT3 != 0 ) {
+			GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
+		}
+		
 		// 对比度判断左限位
 		if ( LIMIT4 != 0 && contrastState == 1 ) {
 			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
@@ -215,9 +220,9 @@ int main(void)
 					}
 					*/
 					
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -252,9 +257,9 @@ int main(void)
 					}
 					*/
 					
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -434,9 +439,9 @@ int main(void)
 					}
 					*/
 					
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
@@ -469,9 +474,9 @@ int main(void)
 					}
 					*/
 					
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
-					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 				}
 			}
 			
