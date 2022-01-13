@@ -223,6 +223,11 @@ int main(void)
 					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					
+					if ( LIMIT3 != 0 ) {
+						// 右限位触发的情况下，先转一会确保离开限位
+						delay_ms(100);
+					}
 				}
 			}
 			
@@ -260,6 +265,11 @@ int main(void)
 					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					
+					if ( LIMIT2 != 0 ) {
+						// 左限位触发的情况下，先转一会确保离开限位
+						delay_ms(100);
+					}
 				}
 			}
 			
@@ -442,6 +452,11 @@ int main(void)
 					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
 					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
+					
+					if ( LIMIT3 != 0 ) {
+						// 右限位触发的情况下，先转一会确保离开限位
+						delay_ms(100);
+					}
 				}
 			}
 			
@@ -477,6 +492,11 @@ int main(void)
 					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
 					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
 					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
+					
+					if ( LIMIT2 != 0 ) {
+						// 左限位触发的情况下，先转一会确保离开限位
+						delay_ms(100);
+					}
 				}
 			}
 			
