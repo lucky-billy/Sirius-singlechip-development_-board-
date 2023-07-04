@@ -10,7 +10,7 @@
 #include "exti.h"
 #include "remote.h"
 #include "dac.h"
-#include "pwm.h"
+//#include "pwm.h"
 
 int main(void)
 { 
@@ -31,18 +31,12 @@ int main(void)
 	u8 warningState = 0;			// 限位警告状态
 	
 	// 占空比初始化
-	TIM1_PWM_Init(500-1, 168-1);	// 84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.     
-	TIM8_PWM_Init(500-1, 168-1);
+	//TIM1_PWM_Init(500-1, 168-1);	// 84M/84=1Mhz的计数频率,重装载值500，所以PWM频率为 1M/500=2Khz.     
+	//TIM8_PWM_Init(500-1, 168-1);
 	
-	GPIO_SetBits(GPIOB, GPIO_Pin_0);	// M1
-	GPIO_SetBits(GPIOE, GPIO_Pin_7);	// M2 
-	GPIO_SetBits(GPIOE, GPIO_Pin_14);	// M3
-	GPIO_SetBits(GPIOD, GPIO_Pin_8);	// M4
-	GPIO_SetBits(GPIOG, GPIO_Pin_6);	// M5
-	GPIO_SetBits(GPIOC, GPIO_Pin_8);	// M6
-	
-	// 无刷电机不停转动
-	TIM_SetCompare4(TIM8, 0);
+	// 无刷电机 M6 不停转动
+	//GPIO_SetBits(GPIOC, GPIO_Pin_8);
+	//TIM_SetCompare4(TIM8, 100);
 	
 	/*
 	使用占空比控制电机
@@ -153,35 +147,35 @@ int main(void)
 		
 		// 调焦判断限位
 		if ( LIMIT0 != 0 || LIMIT1 != 0 ) {
-			TIM_SetCompare1(TIM1, 250);
+			GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// PB0 = 0
 		}
 		
 		// 变倍判断限位
 		if ( LIMIT2 != 0 || LIMIT3 != 0 ) {
-			TIM_SetCompare2(TIM1, 250);
+			GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// PE7 = 0
 		}
 		
 		// 对比度判断左限位
 		if ( LIMIT4 != 0 && contrastState == 1 ) {
-			TIM_SetCompare1(TIM8, 250);
+			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 			contrastState = 3;
 		}
 		
 		// 对比度判断右限位
 		if ( LIMIT5 != 0 && contrastState == 2 ) {
-			TIM_SetCompare1(TIM8, 250);
+			GPIO_ResetBits(GPIOD, GPIO_Pin_8);	// PD8 = 0
 			contrastState = 4;
 		}
 		
 		// 双光源判断左限位
 		if ( LIMIT6 != 0 && lightSource == 1 ) {
-			TIM_SetCompare2(TIM8, 250);
+			GPIO_ResetBits(GPIOG, GPIO_Pin_6);	// PG6 = 0
 			lightSource = 3;
 		}
 		
 		// 双光源判断右限位
 		if ( LIMIT7 != 0 && lightSource == 2 ) {
-			TIM_SetCompare2(TIM8, 250);
+			GPIO_ResetBits(GPIOG, GPIO_Pin_6);	// PG6 = 0
 			lightSource = 4;
 		}
 
@@ -430,7 +424,9 @@ int main(void)
 				if ( LIMIT0 != 0 ) {
 					printf("FL");							// 调焦左限位已触发
 				} else {
-					TIM_SetCompare1(TIM1, 500);
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_8);		// PE8 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_9);		// PE9 = 1
 					
 					if ( LIMIT1 != 0 ) {
 						// 右限位触发的情况下，先转一会确保离开限位
@@ -440,14 +436,16 @@ int main(void)
 			}
 			
 			if ( USART_RX_BUF[0] == 'b' ) {
-				TIM_SetCompare1(TIM1, 250);
+				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == 'c' ) {
 				if ( LIMIT1 != 0 ) {
 					printf("FR");							// 调焦右限位已触发
 				} else {
-					TIM_SetCompare1(TIM1, 0);
+					GPIO_SetBits(GPIOB, GPIO_Pin_0);		// PB0 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_8);		// PE8 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_9);		// PE9 = 0
 					
 					if ( LIMIT0 != 0 ) {
 						// 左限位触发的情况下，先转一会确保离开限位
@@ -457,7 +455,7 @@ int main(void)
 			}
 			
 			if ( USART_RX_BUF[0] == 'd' ) {
-				TIM_SetCompare1(TIM1, 250);
+				GPIO_ResetBits(GPIOB, GPIO_Pin_0);			// PB0 = 0
 			}
 			
 			//------------------------------------------------------------------------------
@@ -467,7 +465,9 @@ int main(void)
 				if ( LIMIT2 != 0 ) {
 					printf("ZL");							// 变倍左限位已触发
 				} else {
-					TIM_SetCompare2(TIM1, 500);
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_10);		// PE10 = 0
+					GPIO_SetBits(GPIOE, GPIO_Pin_11);		// PE11 = 1
 					
 					if ( LIMIT3 != 0 ) {
 						// 右限位触发的情况下，先转一会确保离开限位
@@ -477,14 +477,16 @@ int main(void)
 			}
 			
 			if ( USART_RX_BUF[0] == 'f' ) {
-				TIM_SetCompare2(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == 'g' ) {
 				if ( LIMIT3 != 0 ) {
 					printf("ZR");							// 变倍右限位已触发
 				} else {
-					TIM_SetCompare2(TIM1, 0);
+					GPIO_SetBits(GPIOE, GPIO_Pin_7);		// PE7 = 1
+					GPIO_SetBits(GPIOE, GPIO_Pin_10);		// PE10 = 1
+					GPIO_ResetBits(GPIOE, GPIO_Pin_11);		// PE11 = 0
 					
 					if ( LIMIT2 != 0 ) {
 						// 左限位触发的情况下，先转一会确保离开限位
@@ -494,27 +496,30 @@ int main(void)
 			}
 			
 			if ( USART_RX_BUF[0] == 'h' ) {
-				TIM_SetCompare2(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_7);			// PE7 = 0
 			}
 			
 			//------------------------------------------------------------------------------
 			
 			// 明亮度 M3
 			if ( USART_RX_BUF[0] == 'i' ) {
-				TIM_SetCompare3(TIM1, 500);
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
 			}
 			
 			if ( USART_RX_BUF[0] == 'j' ) {
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == 'k' ) {
-				TIM_SetCompare3(TIM1, 0);
-				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == 'l' ) {
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			//------------------------------------------------------------------------------
@@ -525,7 +530,9 @@ int main(void)
 				if ( LIMIT4 != 0 && (contrastState == 1 || contrastState == 3) ) {	
 					printf("CL");							// 对比度左限位已触发
 				} else {
-					TIM_SetCompare1(TIM8, 500);
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
 					contrastState = 1;						// 往左转
 				}
 			}
@@ -535,7 +542,9 @@ int main(void)
 				if ( LIMIT5 != 0 && (contrastState == 2 || contrastState == 4) ) {
 					printf("CR");							// 对比度右限位已触发
 				} else {
-					TIM_SetCompare1(TIM8, 0);
+					GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+					GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
 					contrastState = 2;						// 往右转
 				}
 			}
@@ -548,7 +557,9 @@ int main(void)
 				if ( LIMIT6 != 0 && (lightSource == 1 || lightSource == 3) ) {	
 					printf("LL");							// 双光源左限位已触发
 				} else {
-					TIM_SetCompare2(TIM8, 500);
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
+					GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
 					lightSource = 1;						// 往左转
 				}
 			}
@@ -558,7 +569,9 @@ int main(void)
 				if ( LIMIT7 != 0 && (lightSource == 2 || lightSource == 4) ) {
 					printf("LR");							// 双光源右限位已触发
 				} else {
-					TIM_SetCompare2(TIM8, 0);
+					GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+					GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
+					GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
 					lightSource = 2;						// 往右转	
 				}
 			}
@@ -568,45 +581,63 @@ int main(void)
 			// 明亮度 - 变亮
 			if ( USART_RX_BUF[0] == '1' )
 			{
-				TIM_SetCompare3(TIM1, 0);
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(15);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '2' )
 			{
-				TIM_SetCompare3(TIM1, 0);
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(30);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '3' )
 			{
-				TIM_SetCompare3(TIM1, 0);
+				GPIO_SetBits(GPIOE, GPIO_Pin_13);			// PE13 = 1
+				GPIO_ResetBits(GPIOE, GPIO_Pin_12);			// PE12 = 0
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(45);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			// 明亮度 - 变暗
 			if ( USART_RX_BUF[0] == '4' )
 			{
-				TIM_SetCompare3(TIM1, 500);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(15);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '5' )
 			{
-				TIM_SetCompare3(TIM1, 500);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(30);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			if ( USART_RX_BUF[0] == '6' )
 			{
-				TIM_SetCompare3(TIM1, 500);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_13);			// PE13 = 0
+				GPIO_SetBits(GPIOE, GPIO_Pin_12);			// PE12 = 1
+				
+				GPIO_SetBits(GPIOE, GPIO_Pin_14);			// PE14 = 1
 				delay_ms(45);
-				TIM_SetCompare3(TIM1, 250);
+				GPIO_ResetBits(GPIOE, GPIO_Pin_14);			// PE14 = 0
 			}
 			
 			// DA卡控制
@@ -781,11 +812,13 @@ int main(void)
 					if ( keyState != 1 ) {
 						// 其他电机全部停止
 						keyState = 1;
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( LIMIT1 == 0 ) {
-							TIM_SetCompare1(TIM1, 0);
+							GPIO_SetBits(GPIOB, GPIO_Pin_0);	// PB0 = 1
+							GPIO_SetBits(GPIOE, GPIO_Pin_8);	// PE8 = 1
+							GPIO_ResetBits(GPIOE, GPIO_Pin_9);	// PE9 = 0
 					
 							// 左限位触发的情况下，先转一会确保离开限位
 							if ( LIMIT0 != 0 ) {
@@ -807,11 +840,13 @@ int main(void)
 					if ( keyState != 2 ) {
 						// 其他电机全部停止
 						keyState = 2;
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( LIMIT0 == 0 ) {
-							TIM_SetCompare1(TIM1, 500);
+							GPIO_SetBits(GPIOB, GPIO_Pin_0);	// PB0 = 1
+							GPIO_ResetBits(GPIOE, GPIO_Pin_8);	// PE8 = 0
+							GPIO_SetBits(GPIOE, GPIO_Pin_9);	// PE9 = 1
 					
 							// 右限位触发的情况下，先转一会确保离开限位
 							if ( LIMIT1 != 0 ) {
@@ -833,11 +868,13 @@ int main(void)
 					if ( keyState != 3 ) {
 						// 其他电机全部停止
 						keyState = 3;
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( LIMIT3 == 0 ) {
-							TIM_SetCompare2(TIM1, 0);
+							GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+							GPIO_SetBits(GPIOE, GPIO_Pin_10);	// PE10 = 1
+							GPIO_ResetBits(GPIOE, GPIO_Pin_11);	// PE11 = 0
 					
 							if ( LIMIT2 != 0 ) {
 								// 左限位触发的情况下，先转一会确保离开限位
@@ -865,11 +902,13 @@ int main(void)
 					if ( keyState != 4 ) {
 						// 其他电机全部停止
 						keyState = 4;
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( LIMIT2 == 0 ) {
-							TIM_SetCompare2(TIM1, 500);
+							GPIO_SetBits(GPIOE, GPIO_Pin_7);	// PE7 = 1
+							GPIO_ResetBits(GPIOE, GPIO_Pin_10);	// PE10 = 0
+							GPIO_SetBits(GPIOE, GPIO_Pin_11);	// PE11 = 1
 					
 							if ( LIMIT3 != 0 ) {
 								// 右限位触发的情况下，先转一会确保离开限位
@@ -890,9 +929,12 @@ int main(void)
 					if ( keyState != 5 ) {
 						// 其他电机全部停止
 						keyState = 5;
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 500);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+					
+						GPIO_SetBits(GPIOE, GPIO_Pin_14);	// PE14 = 1
+						GPIO_ResetBits(GPIOE, GPIO_Pin_13);	// PE13 = 0
+						GPIO_SetBits(GPIOE, GPIO_Pin_12);	// PE12 = 1
 						
 						// 点动模式，运动一下后停止
 						delay_ms(50);
@@ -905,9 +947,12 @@ int main(void)
 					if ( keyState != 6 ) {
 						// 其他电机全部停止
 						keyState = 6;
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 0);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+					
+						GPIO_SetBits(GPIOE, GPIO_Pin_14);	// PE14 = 1
+						GPIO_SetBits(GPIOE, GPIO_Pin_13);	// PE13 = 1
+						GPIO_ResetBits(GPIOE, GPIO_Pin_12);	// PE12 = 0
 						
 						// 点动模式，运动一下后停止
 						delay_ms(50);
@@ -919,15 +964,19 @@ int main(void)
 				case 90: {
 					if ( contrastState == 0 || contrastState == 3 || contrastState == 4 ) {
 						// 其他电机全部停止
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( contrastState == 3 ) {
-							TIM_SetCompare1(TIM8, 0);
+							GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+							GPIO_SetBits(GPIOA, GPIO_Pin_7);		// PA7 = 1
+							GPIO_ResetBits(GPIOC, GPIO_Pin_6);		// PC6 = 0
 							contrastState = 2;						// 往右转
 						} else {
-							TIM_SetCompare1(TIM8, 500);
+							GPIO_SetBits(GPIOD, GPIO_Pin_8);		// PD8 = 1
+							GPIO_ResetBits(GPIOA, GPIO_Pin_7);		// PA7 = 0
+							GPIO_SetBits(GPIOC, GPIO_Pin_6);		// PC6 = 1
 							contrastState = 1;						// 往左转
 						}
 					}
@@ -937,15 +986,19 @@ int main(void)
 				case 66: {
 					if ( lightSource == 0 || lightSource == 3 || lightSource == 4 ) {
 						// 其他电机全部停止
-						TIM_SetCompare1(TIM1, 250);
-						TIM_SetCompare2(TIM1, 250);
-						TIM_SetCompare3(TIM1, 250);
+						GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_7);	// 变倍停止  PE7 = 0
+						GPIO_ResetBits(GPIOE, GPIO_Pin_14);	// 亮度停止	PE14 = 0
 						
 						if ( lightSource == 3 ) {	
-							TIM_SetCompare2(TIM8, 0);
+							GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+							GPIO_SetBits(GPIOB, GPIO_Pin_14);		// PB14 = 1
+							GPIO_ResetBits(GPIOC, GPIO_Pin_7);		// PC7 = 0
 							lightSource = 2;						// 往右转
 						} else {
-							TIM_SetCompare2(TIM8, 500);
+							GPIO_SetBits(GPIOG, GPIO_Pin_6);		// PG6 = 1
+							GPIO_ResetBits(GPIOB, GPIO_Pin_14);		// PB14 = 0
+							GPIO_SetBits(GPIOC, GPIO_Pin_7);		// PC7 = 1
 							lightSource = 1;						// 往左转
 						}
 					}
@@ -972,7 +1025,7 @@ int main(void)
 				// 没有按键按下，状态还原
 				keyState = 0;
 				warningState = 0;
-				TIM_SetCompare1(TIM1, 250);
+				GPIO_ResetBits(GPIOB, GPIO_Pin_0);	// 调焦停止	PB0 = 0
 			}
 		}
 	}
